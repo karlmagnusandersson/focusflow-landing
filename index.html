@@ -496,6 +496,90 @@
             }
         }
     </style>
+
+    <!-- Salesforce Data Cloud Web SDK -->
+    <!-- TODO: Replace YOUR_CONNECTOR_ID with the actual connector ID from Salesforce Setup -->
+    <script src="https://cdn.c360a.salesforce.com/beacon/c360a/b89d98dc-b902-4f39-8dc4-186d39fb25ce/scripts/c360a.min.js"></script>
+
+    <script>
+        // Data Cloud Web SDK Tracking Functions
+
+        // Initialize SDK when loaded
+        function initDataCloud() {
+            if (typeof SalesforceInteractions === 'undefined') {
+                console.warn('Data Cloud SDK not loaded. Tracking disabled.');
+                return;
+            }
+
+            // Initialize the SDK
+            SalesforceInteractions.init();
+
+            // Enable debug logging (set to 0 for production)
+            SalesforceInteractions.setLoggingLevel(4);
+
+            // Capture consent (required before events are sent)
+            // In production, this should be triggered by actual user consent
+            SalesforceInteractions.sendEvent({
+                interaction: {
+                    name: 'Default Consent',
+                    eventType: 'consent',
+                    consent: {
+                        status: 'OptIn',
+                        provider: 'FocusFlow',
+                        purpose: 'Analytics'
+                    }
+                }
+            });
+
+            // Track initial page view
+            trackPageView();
+
+            console.log('[FocusFlow] Data Cloud SDK initialized');
+        }
+
+        // Track page view events
+        function trackPageView() {
+            if (typeof SalesforceInteractions === 'undefined') return;
+
+            SalesforceInteractions.sendEvent({
+                interaction: {
+                    name: 'View Landing Page',
+                    eventType: 'catalog',
+                    catalogObject: {
+                        type: 'Page',
+                        id: 'focusflow-landing'
+                    }
+                }
+            });
+        }
+
+        // Track CTA button clicks
+        function trackCTAClick(buttonName) {
+            if (typeof SalesforceInteractions === 'undefined') {
+                console.log('[FocusFlow] Would track click:', buttonName);
+                return;
+            }
+
+            SalesforceInteractions.sendEvent({
+                interaction: {
+                    name: buttonName,
+                    eventType: 'catalog',
+                    catalogObject: {
+                        type: 'CTA',
+                        id: buttonName.toLowerCase().replace(/\s+/g, '-')
+                    }
+                }
+            });
+
+            console.log('[FocusFlow] Tracked click:', buttonName);
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay to ensure SDK is loaded
+            setTimeout(initDataCloud, 100);
+        });
+    </script>
 </head>
 <body>
     <!-- Navigation -->
@@ -507,7 +591,7 @@
                 <li><a href="#testimonials">Testimonials</a></li>
                 <li><a href="#pricing">Pricing</a></li>
             </ul>
-            <a href="#" class="btn btn-primary">Get Started</a>
+            <a href="#" class="btn btn-primary" onclick="trackCTAClick('Get Started')">Get Started</a>
         </div>
     </nav>
 
@@ -518,8 +602,8 @@
                 <h1>Master Your Focus, Transform Your Work.</h1>
                 <p>FocusFlow helps you achieve deep work through intelligent time blocking, distraction management, and progress insights that actually work.</p>
                 <div class="hero-buttons">
-                    <a href="#" class="btn btn-primary">Start Free Trial</a>
-                    <a href="#" class="btn btn-secondary">Watch Demo</a>
+                    <a href="#" class="btn btn-primary" onclick="trackCTAClick('Start Free Trial')">Start Free Trial</a>
+                    <a href="#" class="btn btn-secondary" onclick="trackCTAClick('Watch Demo')">Watch Demo</a>
                 </div>
             </div>
             <div class="hero-image">
@@ -656,7 +740,7 @@
         <div class="container">
             <h2>Ready to Transform Your Focus?</h2>
             <p>Join thousands of professionals who've taken control of their attention and productivity.</p>
-            <a href="#" class="btn btn-primary">Start Your Free Trial</a>
+            <a href="#" class="btn btn-primary" onclick="trackCTAClick('Start Your Free Trial')">Start Your Free Trial</a>
         </div>
     </section>
 
